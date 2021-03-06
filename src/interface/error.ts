@@ -1,4 +1,4 @@
-export default interface error{
-    message:string,
-    status:number
+export default interface error {
+    message: string,
+    status: number
 }

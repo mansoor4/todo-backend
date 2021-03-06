@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 import isAuthenticate from "../../util/isauthenticated"
 import { OAuth2Client } from "google-auth-library"
-import { where } from "sequelize"
+
 dotenv.config();
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
@@ -83,6 +83,11 @@ export ={
             err.status = 422;
             throw err;
         }
+        if (user?.getDataValue("password") === null) {
+            const err: any = new Error("You have login with google method,reset password to login manually");
+            err.status = 422;
+            throw err;
+        }
         const result = await bcrypt.compare(password, user?.getDataValue("password"))
         if (!result) {
             const err: any = new Error("Password is incorrect");
@@ -139,5 +144,47 @@ export ={
         }
         return { message: "Successfully signout" }
 
+    },
+    resetPassword: async (args: userInputData, req: Request) => {
+        const { userInput } = args;
+        let { email, password, confirmPassword } = userInput;
+        email = email.trim();
+        password = password.trim();
+        confirmPassword = confirmPassword.trim();
+
+        if (validator.isEmpty(email) ||
+            validator.isEmpty(password) ||
+            validator.isEmpty(confirmPassword)) {
+            const err: any = new Error("Fill all the input fields");
+            err.status = 422;
+            throw err;
+        }
+        if (!validator.isEmail(email)) {
+            const err: any = new Error("Email is not valid");
+            err.status = 422;
+            throw err;
+        }
+        const user = await User.findOne({ where: { email: email } });
+        if (!user) {
+            const err: any = new Error("Email is not available, Please signup");
+            err.status = 422;
+            throw err;
+        }
+        if (password !== confirmPassword) {
+            const err: any = new Error("Password and Confirm Password not matched");
+            err.status = 422;
+            throw err;
+        }
+        const hashPassword = await bcrypt.hash(password, 10);
+        password = hashPassword;
+        user.setDataValue("password", password)
+        const saveUser = await user.save()
+        if (!saveUser) {
+            const err: any = new Error("User not saved");
+            err.status = 500;
+            throw err;
+        }
+
+        return { message: "password reset successfully" }
     }
 }

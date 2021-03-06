@@ -63,7 +63,7 @@ export ={
             }
         }
     },
-    
+
     toggleComplete: async (args: todoInputData, req: Request) => {
         const { todoInput } = args
         const { completed, id } = todoInput

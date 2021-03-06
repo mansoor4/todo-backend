@@ -51,6 +51,7 @@ export default buildSchema(`
        contact:String
        email:String
        password:String
+       confirmPassword:String
    }
 
   type TodoQuery {
@@ -72,6 +73,7 @@ export default buildSchema(`
     signup(userInput:InputUserData):UserOutput!
     signin(userInput:InputUserData):UserOutput!
     googleLogin(token:String!):UserOutput!
+    resetPassword(userInput:InputUserData):UserOutput!
    }
 
    type UserQuery{

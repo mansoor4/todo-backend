@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import express, { Application, Request, Response, NextFunction } from "express";
-import bodyParser from "body-parser";
+import helmet from "helmet"
 import cors from "cors";
 import { graphqlHTTP } from "express-graphql"
 import schema from "./graphql/schema"
@@ -9,12 +9,15 @@ import sequelize from "./config/sequelize"
 import User from "./models/user"
 import Todo from "./models/todo"
 const app: Application = express();
+
+
 //Environment variables
 dotenv.config();
 
 // Middlewares
 app.use(express.json());
 app.use(cors());
+app.use(helmet())
 
 // Graphql Middleware
 app.use("/graphql", graphqlHTTP({
@@ -44,11 +47,12 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 User.hasMany(Todo, { onDelete: "CASCADE" });
 Todo.belongsTo(User);
 
-sequelize.sync({ force: true })
+sequelize.sync(/*{ force: true }*/)
     .then(() => {
-        app.listen(process.env.PORT, () => {
-            console.log(`server started at port ${process.env.PORT}`);
-        })
+        app
+            .listen(process.env.PORT, () => {
+                console.log(`server started at port ${process.env.PORT}`);
+            })
     })
     .catch(err => {
         console.log(err);
