@@ -52,7 +52,7 @@ sequelize.sync(/*{ force: true }*/)
     .then(() => {
         app
             .listen(port, () => {
-                console.log(`server started at port ${process.env.PORT}`);
+                console.log(`server started at port ${port}`);
             })
     })
     .catch(err => {
