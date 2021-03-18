@@ -44,13 +44,14 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
         message: err.message
     })
 })
+const port=process.env.PORT || 4000;
 User.hasMany(Todo, { onDelete: "CASCADE" });
 Todo.belongsTo(User);
 
 sequelize.sync(/*{ force: true }*/)
     .then(() => {
         app
-            .listen(process.env.PORT, () => {
+            .listen(port, () => {
                 console.log(`server started at port ${process.env.PORT}`);
             })
     })
